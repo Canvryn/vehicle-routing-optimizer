@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+from html import escape
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -113,10 +114,110 @@ def format_route(route: Route) -> str:
     )
 
 
+def route_summary_rows(routes: list[Route]) -> list[dict[str, str | int | float]]:
+    """Create flat route summaries that can be written to CSV."""
+
+    return [
+        {
+            "vehicle_id": route.vehicle_id,
+            "customer_count": len([stop for stop in route.stops if stop.demand > 0]),
+            "load": route.load,
+            "distance": round(route.distance, 2),
+            "route": " -> ".join(route.stop_ids),
+        }
+        for route in routes
+    ]
+
+
+def write_route_summary(routes: list[Route], output_path: Path) -> None:
+    """Write route-level performance metrics to CSV."""
+
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    rows = route_summary_rows(routes)
+    with output_path.open("w", newline="", encoding="utf-8") as file:
+        writer = csv.DictWriter(
+            file,
+            fieldnames=["vehicle_id", "customer_count", "load", "distance", "route"],
+        )
+        writer.writeheader()
+        writer.writerows(rows)
+
+
+def write_route_map_svg(
+    locations: list[Location],
+    routes: list[Route],
+    output_path: Path,
+    width: int = 900,
+    height: int = 650,
+    padding: int = 50,
+) -> None:
+    """Write a dependency-free SVG map of the route plan."""
+
+    min_x = min(location.x for location in locations)
+    max_x = max(location.x for location in locations)
+    min_y = min(location.y for location in locations)
+    max_y = max(location.y for location in locations)
+    x_range = max(max_x - min_x, 1)
+    y_range = max(max_y - min_y, 1)
+
+    def project(location: Location) -> tuple[float, float]:
+        x = padding + ((location.x - min_x) / x_range) * (width - 2 * padding)
+        y = height - padding - ((location.y - min_y) / y_range) * (height - 2 * padding)
+        return x, y
+
+    colors = [
+        "#2563eb",
+        "#dc2626",
+        "#16a34a",
+        "#9333ea",
+        "#ea580c",
+        "#0891b2",
+        "#be123c",
+        "#4f46e5",
+    ]
+
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    elements = [
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}">',
+        '<rect width="100%" height="100%" fill="#f8fafc"/>',
+        '<text x="24" y="34" font-family="Arial" font-size="22" font-weight="700" fill="#0f172a">Vehicle Routing Baseline</text>',
+    ]
+
+    for route in routes:
+        color = colors[(route.vehicle_id - 1) % len(colors)]
+        points = " ".join(f"{x:.1f},{y:.1f}" for x, y in (project(stop) for stop in route.stops))
+        elements.append(
+            f'<polyline points="{points}" fill="none" stroke="{color}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" opacity="0.82"/>'
+        )
+
+    for location in locations:
+        x, y = project(location)
+        label = escape(location.location_id)
+        if location.location_id == "DEPOT":
+            elements.append(
+                f'<rect x="{x - 8:.1f}" y="{y - 8:.1f}" width="16" height="16" fill="#111827"/>'
+            )
+            elements.append(
+                f'<text x="{x + 12:.1f}" y="{y - 10:.1f}" font-family="Arial" font-size="13" font-weight="700" fill="#111827">{label}</text>'
+            )
+        else:
+            elements.append(
+                f'<circle cx="{x:.1f}" cy="{y:.1f}" r="5" fill="#ffffff" stroke="#334155" stroke-width="2"/>'
+            )
+            elements.append(
+                f'<text x="{x + 7:.1f}" y="{y - 7:.1f}" font-family="Arial" font-size="10" fill="#334155">{label}</text>'
+            )
+
+    elements.append("</svg>")
+    output_path.write_text("\n".join(elements), encoding="utf-8")
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Run baseline nearest-neighbor VRP.")
     parser.add_argument("--input", type=Path, default=Path("data/sample_customers.csv"))
     parser.add_argument("--vehicle-capacity", type=int, default=40)
+    parser.add_argument("--summary-output", type=Path)
+    parser.add_argument("--map-output", type=Path)
     return parser.parse_args()
 
 
@@ -131,6 +232,14 @@ def main() -> None:
     print()
     for route in routes:
         print(format_route(route))
+
+    if args.summary_output:
+        write_route_summary(routes, args.summary_output)
+        print(f"\nWrote route summary to {args.summary_output}")
+
+    if args.map_output:
+        write_route_map_svg(locations, routes, args.map_output)
+        print(f"Wrote route map to {args.map_output}")
 
 
 if __name__ == "__main__":

@@ -23,6 +23,8 @@ Vehicle routing is a classic operations research problem with direct application
 - Build feasible vehicle routes using a nearest-neighbor heuristic.
 - Respect vehicle capacity constraints.
 - Report total distance and route-level summaries.
+- Export route summaries to CSV.
+- Export a dependency-free SVG route map.
 
 ## Project Structure
 
@@ -38,6 +40,8 @@ Vehicle routing is a classic operations research problem with direct application
   data/
     sample_customers.csv
   results/
+    route_map.svg
+    route_summary.csv
   tests/
     test_distance.py
     test_heuristic.py
@@ -89,6 +93,12 @@ Run the baseline heuristic:
 python src/heuristic.py --input data/sample_customers.csv --vehicle-capacity 40
 ```
 
+Save route outputs:
+
+```bash
+python src/heuristic.py --input data/sample_customers.csv --vehicle-capacity 40 --summary-output results/route_summary.csv --map-output results/route_map.svg
+```
+
 Run tests:
 
 ```bash
@@ -114,4 +124,3 @@ Your exact output may differ when you generate a new data set.
 - Compare heuristic and solver performance.
 - Add time windows and lateness penalties.
 - Create experiment scenarios for small, medium, and larger instances.
-- Export route summaries to CSV.

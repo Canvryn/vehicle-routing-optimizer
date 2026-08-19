@@ -1,0 +1,4 @@
+vehicle_id,customer_count,load,distance,route
+1,9,40,209.36,DEPOT -> C007 -> C005 -> C020 -> C010 -> C006 -> C012 -> C003 -> C017 -> C013 -> DEPOT
+2,9,37,185.47,DEPOT -> C019 -> C009 -> C018 -> C015 -> C008 -> C016 -> C001 -> C004 -> C002 -> DEPOT
+3,2,16,123.94,DEPOT -> C014 -> C011 -> DEPOT

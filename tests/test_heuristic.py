@@ -1,7 +1,13 @@
+import tempfile
 import unittest
+from pathlib import Path
 
 from src.distance import Location
-from src.heuristic import solve_nearest_neighbor
+from src.heuristic import (
+    route_summary_rows,
+    solve_nearest_neighbor,
+    write_route_summary,
+)
 
 
 class HeuristicTests(unittest.TestCase):
@@ -32,6 +38,37 @@ class HeuristicTests(unittest.TestCase):
 
         with self.assertRaisesRegex(ValueError, "exceed vehicle capacity"):
             solve_nearest_neighbor(locations, vehicle_capacity=10)
+
+    def test_route_summary_rows_include_metrics_and_path(self) -> None:
+        locations = [
+            Location("DEPOT", 0, 0, 0),
+            Location("C001", 1, 0, 4),
+            Location("C002", 2, 0, 5),
+        ]
+
+        routes = solve_nearest_neighbor(locations, vehicle_capacity=10)
+        rows = route_summary_rows(routes)
+
+        self.assertEqual(rows[0]["vehicle_id"], 1)
+        self.assertEqual(rows[0]["customer_count"], 2)
+        self.assertEqual(rows[0]["load"], 9)
+        self.assertIn("DEPOT -> C001 -> C002 -> DEPOT", rows[0]["route"])
+
+    def test_write_route_summary_creates_csv(self) -> None:
+        locations = [
+            Location("DEPOT", 0, 0, 0),
+            Location("C001", 1, 0, 4),
+        ]
+        routes = solve_nearest_neighbor(locations, vehicle_capacity=10)
+
+        with tempfile.TemporaryDirectory() as directory:
+            output_path = Path(directory) / "summary.csv"
+            write_route_summary(routes, output_path)
+
+            contents = output_path.read_text(encoding="utf-8")
+
+        self.assertIn("vehicle_id,customer_count,load,distance,route", contents)
+        self.assertIn("DEPOT -> C001 -> DEPOT", contents)
 
 
 if __name__ == "__main__":
