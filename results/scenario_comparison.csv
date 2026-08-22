@@ -1,0 +1,5 @@
+vehicle_capacity,route_count,total_distance,total_demand,average_utilization,max_route_distance,runtime_ms
+25,4,685.02,93,0.93,193.67,0.564
+30,4,716.31,93,0.775,284.64,0.494
+40,3,518.77,93,0.775,209.36,0.499
+50,2,474.83,93,0.93,255.7,0.522

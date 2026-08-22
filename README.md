@@ -25,6 +25,7 @@ Vehicle routing is a classic operations research problem with direct application
 - Report total distance and route-level summaries.
 - Export route summaries to CSV.
 - Export a dependency-free SVG route map.
+- Compare routing outcomes across multiple vehicle-capacity scenarios.
 
 ## Project Structure
 
@@ -37,11 +38,13 @@ Vehicle routing is a classic operations research problem with direct application
     distance.py
     generate_data.py
     heuristic.py
+    experiments.py
   data/
     sample_customers.csv
   results/
     route_map.svg
     route_summary.csv
+    scenario_comparison.csv
   tests/
     test_distance.py
     test_heuristic.py
@@ -97,6 +100,12 @@ Save route outputs:
 
 ```bash
 python src/heuristic.py --input data/sample_customers.csv --vehicle-capacity 40 --summary-output results/route_summary.csv --map-output results/route_map.svg
+```
+
+Run capacity comparison experiments:
+
+```bash
+python src/experiments.py --input data/sample_customers.csv --capacities 25,30,40,50 --output results/scenario_comparison.csv
 ```
 
 Run tests:
