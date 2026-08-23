@@ -6,6 +6,7 @@ from src.distance import Location
 from src.heuristic import (
     route_summary_rows,
     solve_nearest_neighbor,
+    write_route_map_svg,
     write_route_summary,
 )
 
@@ -69,6 +70,22 @@ class HeuristicTests(unittest.TestCase):
 
         self.assertIn("vehicle_id,customer_count,load,distance,route", contents)
         self.assertIn("DEPOT -> C001 -> DEPOT", contents)
+
+    def test_write_route_map_svg_includes_legend_and_demand_labels(self) -> None:
+        locations = [
+            Location("DEPOT", 0, 0, 0),
+            Location("C001", 1, 0, 4),
+        ]
+        routes = solve_nearest_neighbor(locations, vehicle_capacity=10)
+
+        with tempfile.TemporaryDirectory() as directory:
+            output_path = Path(directory) / "route_map.svg"
+            write_route_map_svg(locations, routes, output_path)
+            contents = output_path.read_text(encoding="utf-8")
+
+        self.assertIn("Route Legend", contents)
+        self.assertIn("Vehicle 1: load 4, dist", contents)
+        self.assertIn("C001 d=4", contents)
 
 
 if __name__ == "__main__":

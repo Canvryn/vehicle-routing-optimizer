@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import argparse
 import csv
-from html import escape
 from dataclasses import dataclass
+from html import escape
 from pathlib import Path
 
 try:
@@ -175,19 +175,36 @@ def write_route_map_svg(
         "#be123c",
         "#4f46e5",
     ]
+    total_distance = sum(route.distance for route in routes)
+    total_demand = sum(location.demand for location in locations)
+    route_count = len(routes)
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
     elements = [
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}">',
         '<rect width="100%" height="100%" fill="#f8fafc"/>',
-        '<text x="24" y="34" font-family="Arial" font-size="22" font-weight="700" fill="#0f172a">Vehicle Routing Baseline</text>',
+        '<rect x="18" y="16" width="360" height="92" fill="#ffffff" stroke="#cbd5e1" stroke-width="1"/>',
+        '<text x="36" y="46" font-family="Arial" font-size="22" font-weight="700" fill="#0f172a">Vehicle Routing Baseline</text>',
+        f'<text x="36" y="72" font-family="Arial" font-size="13" fill="#475569">Routes: {route_count} | Demand: {total_demand} | Distance: {total_distance:.2f}</text>',
+        '<text x="36" y="94" font-family="Arial" font-size="12" fill="#64748b">Nearest-neighbor heuristic with vehicle capacity constraints</text>',
+        f'<rect x="{width - 250}" y="24" width="220" height="{44 + 24 * max(route_count, 1)}" fill="#ffffff" stroke="#cbd5e1" stroke-width="1"/>',
+        f'<text x="{width - 230}" y="51" font-family="Arial" font-size="15" font-weight="700" fill="#0f172a">Route Legend</text>',
     ]
 
     for route in routes:
         color = colors[(route.vehicle_id - 1) % len(colors)]
-        points = " ".join(f"{x:.1f},{y:.1f}" for x, y in (project(stop) for stop in route.stops))
+        points = " ".join(
+            f"{x:.1f},{y:.1f}" for x, y in (project(stop) for stop in route.stops)
+        )
         elements.append(
             f'<polyline points="{points}" fill="none" stroke="{color}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" opacity="0.82"/>'
+        )
+        legend_y = 78 + 24 * (route.vehicle_id - 1)
+        elements.append(
+            f'<line x1="{width - 230}" y1="{legend_y}" x2="{width - 204}" y2="{legend_y}" stroke="{color}" stroke-width="4" stroke-linecap="round"/>'
+        )
+        elements.append(
+            f'<text x="{width - 194}" y="{legend_y + 4}" font-family="Arial" font-size="12" fill="#334155">Vehicle {route.vehicle_id}: load {route.load}, dist {route.distance:.1f}</text>'
         )
 
     for location in locations:
@@ -205,7 +222,7 @@ def write_route_map_svg(
                 f'<circle cx="{x:.1f}" cy="{y:.1f}" r="5" fill="#ffffff" stroke="#334155" stroke-width="2"/>'
             )
             elements.append(
-                f'<text x="{x + 7:.1f}" y="{y - 7:.1f}" font-family="Arial" font-size="10" fill="#334155">{label}</text>'
+                f'<text x="{x + 7:.1f}" y="{y - 7:.1f}" font-family="Arial" font-size="10" fill="#334155">{label} d={location.demand}</text>'
             )
 
     elements.append("</svg>")

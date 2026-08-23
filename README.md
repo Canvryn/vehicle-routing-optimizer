@@ -24,7 +24,7 @@ Vehicle routing is a classic operations research problem with direct application
 - Respect vehicle capacity constraints.
 - Report total distance and route-level summaries.
 - Export route summaries to CSV.
-- Export a dependency-free SVG route map.
+- Export a dependency-free SVG route map with route legend and demand labels.
 - Compare routing outcomes across multiple vehicle-capacity scenarios.
 
 ## Project Structure
