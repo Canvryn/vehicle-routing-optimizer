@@ -26,6 +26,7 @@ Vehicle routing is a classic operations research problem with direct application
 - Export route summaries to CSV.
 - Export a dependency-free SVG route map with route legend and demand labels.
 - Compare routing outcomes across multiple vehicle-capacity scenarios.
+- Validate route feasibility against depot, visit, load, and capacity constraints.
 
 ## Project Structure
 
@@ -39,6 +40,7 @@ Vehicle routing is a classic operations research problem with direct application
     generate_data.py
     heuristic.py
     experiments.py
+    validate.py
   data/
     sample_customers.csv
   results/
@@ -106,6 +108,12 @@ Run capacity comparison experiments:
 
 ```bash
 python src/experiments.py --input data/sample_customers.csv --capacities 25,30,40,50 --output results/scenario_comparison.csv
+```
+
+Validate the baseline routes:
+
+```bash
+python src/validate.py --input data/sample_customers.csv --vehicle-capacity 40
 ```
 
 Run tests:
