@@ -5,17 +5,21 @@
 - Baseline route plan uses 3 routes.
 - Baseline route plan travels 518.77 distance units.
 - Baseline route plan serves 93 units of demand.
-- Lowest-distance capacity scenario: capacity 50 with total distance 474.83.
+- Lowest-distance capacity scenario: capacity 50 with total distance 431.08.
 - Fewest-route capacity scenario: capacity 50 using 2 routes.
 
 ## Scenario Comparison
 
-| vehicle_capacity | route_count | total_distance | average_utilization | runtime_ms |
-| --- | --- | --- | --- | --- |
-| 25 | 4 | 685.02 | 0.93 | 0.564 |
-| 30 | 4 | 716.31 | 0.775 | 0.494 |
-| 40 | 3 | 518.77 | 0.775 | 0.499 |
-| 50 | 2 | 474.83 | 0.93 | 0.522 |
+| method | vehicle_capacity | route_count | total_distance | average_utilization | runtime_ms |
+| --- | --- | --- | --- | --- | --- |
+| nearest_neighbor | 25 | 4 | 685.02 | 0.93 | 0.564 |
+| nearest_neighbor | 30 | 4 | 716.31 | 0.775 | 0.501 |
+| nearest_neighbor | 40 | 3 | 518.77 | 0.775 | 0.503 |
+| nearest_neighbor | 50 | 2 | 474.83 | 0.93 | 0.476 |
+| savings | 25 | 4 | 535.53 | 0.93 | 2.823 |
+| savings | 30 | 4 | 511.08 | 0.775 | 3.003 |
+| savings | 40 | 3 | 445.25 | 0.775 | 2.193 |
+| savings | 50 | 2 | 431.08 | 0.93 | 1.671 |
 
 ## Baseline Routes
 
@@ -27,4 +31,4 @@
 
 ## Interpretation
 
-Increasing vehicle capacity generally reduces the number of routes, but the nearest-neighbor heuristic can still produce non-monotonic distance changes because early greedy choices affect later routing options. This motivates comparing the baseline against a solver-based optimization model in a future phase.
+Increasing vehicle capacity generally reduces the number of routes, but route distance still depends on the construction heuristic. In this sample, the Clarke-Wright savings heuristic improves on the nearest-neighbor baseline because it explicitly evaluates the distance saved by merging single-customer routes. This creates a stronger benchmark for a future solver-based optimization model.

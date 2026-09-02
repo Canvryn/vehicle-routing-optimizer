@@ -2,7 +2,7 @@
 
 This project models a delivery routing problem as an operations research decision tool. Given a depot, a fleet of vehicles, customer locations, and customer demand, the goal is to assign deliveries to vehicle routes that minimize travel distance while satisfying capacity constraints.
 
-The first version includes a reproducible synthetic data generator, distance matrix utilities, and a nearest-neighbor baseline heuristic. Future versions will compare this baseline against an optimization solver such as Google OR-Tools and extend the model with time windows, lateness penalties, and richer experiments.
+The project includes a reproducible synthetic data generator, distance matrix utilities, a nearest-neighbor baseline heuristic, and a Clarke-Wright savings heuristic. Future versions will compare these heuristics against an optimization solver such as Google OR-Tools and extend the model with time windows, lateness penalties, and richer experiments.
 
 ## Why This Project Matters
 
@@ -21,6 +21,7 @@ Vehicle routing is a classic operations research problem with direct application
 - Assign each customer a delivery demand.
 - Compute Euclidean distances between all locations.
 - Build feasible vehicle routes using a nearest-neighbor heuristic.
+- Build feasible vehicle routes using the Clarke-Wright savings heuristic.
 - Respect vehicle capacity constraints.
 - Report total distance and route-level summaries.
 - Export route summaries to CSV.
@@ -40,6 +41,7 @@ Vehicle routing is a classic operations research problem with direct application
     distance.py
     generate_data.py
     heuristic.py
+    savings.py
     experiments.py
     validate.py
     report.py
@@ -101,6 +103,12 @@ Run the baseline heuristic:
 python src/heuristic.py --input data/sample_customers.csv --vehicle-capacity 40
 ```
 
+Run the Clarke-Wright savings heuristic:
+
+```bash
+python src/savings.py --input data/sample_customers.csv --vehicle-capacity 40
+```
+
 Save route outputs:
 
 ```bash
@@ -110,7 +118,7 @@ python src/heuristic.py --input data/sample_customers.csv --vehicle-capacity 40 
 Run capacity comparison experiments:
 
 ```bash
-python src/experiments.py --input data/sample_customers.csv --capacities 25,30,40,50 --output results/scenario_comparison.csv
+python src/experiments.py --input data/sample_customers.csv --capacities 25,30,40,50 --methods nearest_neighbor,savings --output results/scenario_comparison.csv
 ```
 
 Validate the baseline routes:

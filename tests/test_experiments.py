@@ -6,6 +6,7 @@ from src.distance import Location
 from src.experiments import (
     evaluate_capacity_scenario,
     parse_capacities,
+    parse_methods,
     run_capacity_scenarios,
     write_scenario_results,
 )
@@ -22,6 +23,7 @@ class ExperimentTests(unittest.TestCase):
 
         result, routes = evaluate_capacity_scenario(locations, vehicle_capacity=10)
 
+        self.assertEqual(result.method, "nearest_neighbor")
         self.assertEqual(result.vehicle_capacity, 10)
         self.assertEqual(result.total_demand, 15)
         self.assertEqual(result.route_count, len(routes))
@@ -40,6 +42,21 @@ class ExperimentTests(unittest.TestCase):
 
         self.assertEqual([result.vehicle_capacity for result in results], [10, 20])
 
+    def test_run_capacity_scenarios_compares_selected_methods(self) -> None:
+        locations = [
+            Location("DEPOT", 0, 0, 0),
+            Location("C001", 1, 0, 4),
+            Location("C002", 2, 0, 5),
+        ]
+
+        results = run_capacity_scenarios(
+            locations, [10], methods=["nearest_neighbor", "savings"]
+        )
+
+        self.assertEqual(
+            [result.method for result in results], ["nearest_neighbor", "savings"]
+        )
+
     def test_write_scenario_results_creates_csv(self) -> None:
         locations = [
             Location("DEPOT", 0, 0, 0),
@@ -52,14 +69,17 @@ class ExperimentTests(unittest.TestCase):
             write_scenario_results(results, output_path)
             contents = output_path.read_text(encoding="utf-8")
 
-        self.assertIn("vehicle_capacity,route_count,total_distance", contents)
-        self.assertIn("10,1", contents)
+        self.assertIn("method,vehicle_capacity,route_count,total_distance", contents)
+        self.assertIn("nearest_neighbor,10,1", contents)
 
     def test_parse_capacities_rejects_nonpositive_values(self) -> None:
         with self.assertRaisesRegex(ValueError, "positive"):
             parse_capacities("20,0")
 
+    def test_parse_methods_rejects_empty_values(self) -> None:
+        with self.assertRaisesRegex(ValueError, "at least one method"):
+            parse_methods(" , ")
+
 
 if __name__ == "__main__":
     unittest.main()
-

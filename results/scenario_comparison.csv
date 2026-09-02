@@ -1,5 +1,9 @@
-vehicle_capacity,route_count,total_distance,total_demand,average_utilization,max_route_distance,runtime_ms
-25,4,685.02,93,0.93,193.67,0.564
-30,4,716.31,93,0.775,284.64,0.494
-40,3,518.77,93,0.775,209.36,0.499
-50,2,474.83,93,0.93,255.7,0.522
+method,vehicle_capacity,route_count,total_distance,total_demand,average_utilization,max_route_distance,runtime_ms
+nearest_neighbor,25,4,685.02,93,0.93,193.67,0.564
+nearest_neighbor,30,4,716.31,93,0.775,284.64,0.501
+nearest_neighbor,40,3,518.77,93,0.775,209.36,0.503
+nearest_neighbor,50,2,474.83,93,0.93,255.7,0.476
+savings,25,4,535.53,93,0.93,158.23,2.823
+savings,30,4,511.08,93,0.775,158.23,3.003
+savings,40,3,445.25,93,0.775,158.32,2.193
+savings,50,2,431.08,93,0.93,229.96,1.671

@@ -9,13 +9,16 @@ from time import perf_counter
 try:
     from .distance import Location
     from .heuristic import Route, load_locations, solve_nearest_neighbor
+    from .savings import solve_clarke_wright_savings
 except ImportError:
     from distance import Location
     from heuristic import Route, load_locations, solve_nearest_neighbor
+    from savings import solve_clarke_wright_savings
 
 
 @dataclass(frozen=True)
 class ScenarioResult:
+    method: str
     vehicle_capacity: int
     route_count: int
     total_distance: float
@@ -26,12 +29,19 @@ class ScenarioResult:
 
 
 def evaluate_capacity_scenario(
-    locations: list[Location], vehicle_capacity: int
+    locations: list[Location], vehicle_capacity: int, method: str = "nearest_neighbor"
 ) -> tuple[ScenarioResult, list[Route]]:
     """Solve one capacity scenario and return route-level performance metrics."""
 
+    solvers = {
+        "nearest_neighbor": solve_nearest_neighbor,
+        "savings": solve_clarke_wright_savings,
+    }
+    if method not in solvers:
+        raise ValueError(f"Unknown method: {method}")
+
     start = perf_counter()
-    routes = solve_nearest_neighbor(locations, vehicle_capacity=vehicle_capacity)
+    routes = solvers[method](locations, vehicle_capacity=vehicle_capacity)
     runtime_ms = (perf_counter() - start) * 1000
 
     total_distance = sum(route.distance for route in routes)
@@ -42,6 +52,7 @@ def evaluate_capacity_scenario(
 
     return (
         ScenarioResult(
+            method=method,
             vehicle_capacity=vehicle_capacity,
             route_count=len(routes),
             total_distance=round(total_distance, 2),
@@ -55,12 +66,16 @@ def evaluate_capacity_scenario(
 
 
 def run_capacity_scenarios(
-    locations: list[Location], vehicle_capacities: list[int]
+    locations: list[Location],
+    vehicle_capacities: list[int],
+    methods: list[str] | None = None,
 ) -> list[ScenarioResult]:
-    """Compare the baseline heuristic across several vehicle capacities."""
+    """Compare routing methods across several vehicle capacities."""
 
+    selected_methods = methods or ["nearest_neighbor"]
     return [
-        evaluate_capacity_scenario(locations, capacity)[0]
+        evaluate_capacity_scenario(locations, capacity, method)[0]
+        for method in selected_methods
         for capacity in vehicle_capacities
     ]
 
@@ -75,6 +90,7 @@ def write_scenario_results(
         writer = csv.DictWriter(
             file,
             fieldnames=[
+                "method",
                 "vehicle_capacity",
                 "route_count",
                 "total_distance",
@@ -95,10 +111,18 @@ def parse_capacities(raw_capacities: str) -> list[int]:
     return capacities
 
 
+def parse_methods(raw_methods: str) -> list[str]:
+    methods = [value.strip() for value in raw_methods.split(",") if value.strip()]
+    if not methods:
+        raise ValueError("at least one method is required")
+    return methods
+
+
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Run baseline VRP capacity scenarios.")
+    parser = argparse.ArgumentParser(description="Run VRP capacity scenarios.")
     parser.add_argument("--input", type=Path, default=Path("data/sample_customers.csv"))
     parser.add_argument("--capacities", default="25,30,40,50")
+    parser.add_argument("--methods", default="nearest_neighbor,savings")
     parser.add_argument(
         "--output",
         type=Path,
@@ -111,12 +135,14 @@ def main() -> None:
     args = parse_args()
     locations = load_locations(args.input)
     capacities = parse_capacities(args.capacities)
-    scenario_results = run_capacity_scenarios(locations, capacities)
+    methods = parse_methods(args.methods)
+    scenario_results = run_capacity_scenarios(locations, capacities, methods)
     write_scenario_results(scenario_results, args.output)
 
     print(f"Wrote {len(scenario_results)} scenario results to {args.output}")
     for result in scenario_results:
         print(
+            f"method={result.method}, "
             f"capacity={result.vehicle_capacity}, "
             f"routes={result.route_count}, "
             f"distance={result.total_distance:.2f}, "

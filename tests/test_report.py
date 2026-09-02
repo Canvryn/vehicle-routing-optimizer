@@ -14,6 +14,7 @@ class ReportTests(unittest.TestCase):
     def setUp(self) -> None:
         self.scenario_rows = [
             {
+                "method": "nearest_neighbor",
                 "vehicle_capacity": "25",
                 "route_count": "4",
                 "total_distance": "685.02",
@@ -21,6 +22,7 @@ class ReportTests(unittest.TestCase):
                 "runtime_ms": "0.254",
             },
             {
+                "method": "savings",
                 "vehicle_capacity": "50",
                 "route_count": "2",
                 "total_distance": "474.83",
@@ -53,7 +55,7 @@ class ReportTests(unittest.TestCase):
 
         self.assertIn("# Vehicle Routing Experiment Report", report)
         self.assertIn("Lowest-distance capacity scenario", report)
-        self.assertIn("| vehicle_capacity | route_count | total_distance", report)
+        self.assertIn("| method | vehicle_capacity | route_count", report)
         self.assertIn("DEPOT -> C001 -> C002 -> DEPOT", report)
 
     def test_write_experiment_report_creates_markdown_file(self) -> None:
@@ -63,8 +65,8 @@ class ReportTests(unittest.TestCase):
             routes_path = directory_path / "routes.csv"
             output_path = directory_path / "report.md"
             scenarios_path.write_text(
-                "vehicle_capacity,route_count,total_distance,average_utilization,runtime_ms\n"
-                "50,2,474.83,0.93,0.436\n",
+                "method,vehicle_capacity,route_count,total_distance,average_utilization,runtime_ms\n"
+                "savings,50,2,474.83,0.93,0.436\n",
                 encoding="utf-8",
             )
             routes_path.write_text(
@@ -81,4 +83,3 @@ class ReportTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-

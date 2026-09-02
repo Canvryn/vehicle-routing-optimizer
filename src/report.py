@@ -57,6 +57,7 @@ def build_experiment_report(
     total_route_load = sum(int(row["load"]) for row in route_rows)
 
     scenario_columns = [
+        "method",
         "vehicle_capacity",
         "route_count",
         "total_distance",
@@ -87,7 +88,7 @@ def build_experiment_report(
             "",
             "## Interpretation",
             "",
-            "Increasing vehicle capacity generally reduces the number of routes, but the nearest-neighbor heuristic can still produce non-monotonic distance changes because early greedy choices affect later routing options. This motivates comparing the baseline against a solver-based optimization model in a future phase.",
+            "Increasing vehicle capacity generally reduces the number of routes, but route distance still depends on the construction heuristic. In this sample, the Clarke-Wright savings heuristic improves on the nearest-neighbor baseline because it explicitly evaluates the distance saved by merging single-customer routes. This creates a stronger benchmark for a future solver-based optimization model.",
             "",
         ]
     )
@@ -133,4 +134,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
