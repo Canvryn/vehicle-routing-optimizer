@@ -12,14 +12,22 @@
 
 | method | vehicle_capacity | route_count | total_distance | average_utilization | runtime_ms |
 | --- | --- | --- | --- | --- | --- |
-| nearest_neighbor | 25 | 4 | 685.02 | 0.93 | 0.564 |
-| nearest_neighbor | 30 | 4 | 716.31 | 0.775 | 0.501 |
-| nearest_neighbor | 40 | 3 | 518.77 | 0.775 | 0.503 |
-| nearest_neighbor | 50 | 2 | 474.83 | 0.93 | 0.476 |
-| savings | 25 | 4 | 535.53 | 0.93 | 2.823 |
-| savings | 30 | 4 | 511.08 | 0.775 | 3.003 |
-| savings | 40 | 3 | 445.25 | 0.775 | 2.193 |
-| savings | 50 | 2 | 431.08 | 0.93 | 1.671 |
+| nearest_neighbor | 25 | 4 | 685.02 | 0.93 | 0.235 |
+| nearest_neighbor | 30 | 4 | 716.31 | 0.775 | 0.225 |
+| nearest_neighbor | 40 | 3 | 518.77 | 0.775 | 0.187 |
+| nearest_neighbor | 50 | 2 | 474.83 | 0.93 | 0.308 |
+| nearest_neighbor_2opt | 25 | 4 | 670.88 | 0.93 | 0.567 |
+| nearest_neighbor_2opt | 30 | 4 | 675.14 | 0.775 | 0.498 |
+| nearest_neighbor_2opt | 40 | 3 | 505.74 | 0.775 | 0.58 |
+| nearest_neighbor_2opt | 50 | 2 | 450.31 | 0.93 | 0.817 |
+| savings | 25 | 4 | 535.53 | 0.93 | 1.001 |
+| savings | 30 | 4 | 511.08 | 0.775 | 0.966 |
+| savings | 40 | 3 | 445.25 | 0.775 | 0.962 |
+| savings | 50 | 2 | 431.08 | 0.93 | 0.854 |
+| savings_2opt | 25 | 4 | 535.53 | 0.93 | 1.393 |
+| savings_2opt | 30 | 4 | 511.08 | 0.775 | 1.515 |
+| savings_2opt | 40 | 3 | 445.25 | 0.775 | 1.214 |
+| savings_2opt | 50 | 2 | 431.08 | 0.93 | 1.616 |
 
 ## Baseline Routes
 
@@ -31,4 +39,4 @@
 
 ## Interpretation
 
-Increasing vehicle capacity generally reduces the number of routes, but route distance still depends on the construction heuristic. In this sample, the Clarke-Wright savings heuristic improves on the nearest-neighbor baseline because it explicitly evaluates the distance saved by merging single-customer routes. This creates a stronger benchmark for a future solver-based optimization model.
+Increasing vehicle capacity generally reduces the number of routes, but route distance still depends on the construction heuristic and local-search improvement step. In this sample, 2-opt improves the nearest-neighbor routes by reordering stops within each vehicle route, while the Clarke-Wright savings heuristic is already stronger because it explicitly evaluates the distance saved by merging single-customer routes. This creates a stronger benchmark for a future solver-based optimization model.

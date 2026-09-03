@@ -22,6 +22,7 @@ Vehicle routing is a classic operations research problem with direct application
 - Compute Euclidean distances between all locations.
 - Build feasible vehicle routes using a nearest-neighbor heuristic.
 - Build feasible vehicle routes using the Clarke-Wright savings heuristic.
+- Improve route ordering with a 2-opt local search pass.
 - Respect vehicle capacity constraints.
 - Report total distance and route-level summaries.
 - Export route summaries to CSV.
@@ -42,6 +43,7 @@ Vehicle routing is a classic operations research problem with direct application
     generate_data.py
     heuristic.py
     savings.py
+    improve.py
     experiments.py
     validate.py
     report.py
@@ -109,6 +111,12 @@ Run the Clarke-Wright savings heuristic:
 python src/savings.py --input data/sample_customers.csv --vehicle-capacity 40
 ```
 
+Run savings plus 2-opt local search:
+
+```bash
+python src/improve.py --input data/sample_customers.csv --vehicle-capacity 40
+```
+
 Save route outputs:
 
 ```bash
@@ -118,7 +126,7 @@ python src/heuristic.py --input data/sample_customers.csv --vehicle-capacity 40 
 Run capacity comparison experiments:
 
 ```bash
-python src/experiments.py --input data/sample_customers.csv --capacities 25,30,40,50 --methods nearest_neighbor,savings --output results/scenario_comparison.csv
+python src/experiments.py --input data/sample_customers.csv --capacities 25,30,40,50 --methods nearest_neighbor,nearest_neighbor_2opt,savings,savings_2opt --output results/scenario_comparison.csv
 ```
 
 Validate the baseline routes:

@@ -9,10 +9,12 @@ from time import perf_counter
 try:
     from .distance import Location
     from .heuristic import Route, load_locations, solve_nearest_neighbor
+    from .improve import improve_routes_with_two_opt
     from .savings import solve_clarke_wright_savings
 except ImportError:
     from distance import Location
     from heuristic import Route, load_locations, solve_nearest_neighbor
+    from improve import improve_routes_with_two_opt
     from savings import solve_clarke_wright_savings
 
 
@@ -33,15 +35,19 @@ def evaluate_capacity_scenario(
 ) -> tuple[ScenarioResult, list[Route]]:
     """Solve one capacity scenario and return route-level performance metrics."""
 
-    solvers = {
+    construction_solvers = {
         "nearest_neighbor": solve_nearest_neighbor,
+        "nearest_neighbor_2opt": solve_nearest_neighbor,
         "savings": solve_clarke_wright_savings,
+        "savings_2opt": solve_clarke_wright_savings,
     }
-    if method not in solvers:
+    if method not in construction_solvers:
         raise ValueError(f"Unknown method: {method}")
 
     start = perf_counter()
-    routes = solvers[method](locations, vehicle_capacity=vehicle_capacity)
+    routes = construction_solvers[method](locations, vehicle_capacity=vehicle_capacity)
+    if method.endswith("_2opt"):
+        routes = improve_routes_with_two_opt(locations, routes)
     runtime_ms = (perf_counter() - start) * 1000
 
     total_distance = sum(route.distance for route in routes)
@@ -122,7 +128,10 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Run VRP capacity scenarios.")
     parser.add_argument("--input", type=Path, default=Path("data/sample_customers.csv"))
     parser.add_argument("--capacities", default="25,30,40,50")
-    parser.add_argument("--methods", default="nearest_neighbor,savings")
+    parser.add_argument(
+        "--methods",
+        default="nearest_neighbor,nearest_neighbor_2opt,savings,savings_2opt",
+    )
     parser.add_argument(
         "--output",
         type=Path,

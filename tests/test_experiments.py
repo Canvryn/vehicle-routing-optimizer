@@ -50,12 +50,27 @@ class ExperimentTests(unittest.TestCase):
         ]
 
         results = run_capacity_scenarios(
-            locations, [10], methods=["nearest_neighbor", "savings"]
+            locations, [10], methods=["nearest_neighbor", "savings", "savings_2opt"]
         )
 
         self.assertEqual(
-            [result.method for result in results], ["nearest_neighbor", "savings"]
+            [result.method for result in results],
+            ["nearest_neighbor", "savings", "savings_2opt"],
         )
+
+    def test_evaluate_capacity_scenario_supports_two_opt_method(self) -> None:
+        locations = [
+            Location("DEPOT", 0, 0, 0),
+            Location("C001", 1, 0, 4),
+            Location("C002", 2, 0, 5),
+        ]
+
+        result, routes = evaluate_capacity_scenario(
+            locations, vehicle_capacity=10, method="nearest_neighbor_2opt"
+        )
+
+        self.assertEqual(result.method, "nearest_neighbor_2opt")
+        self.assertEqual(result.route_count, len(routes))
 
     def test_write_scenario_results_creates_csv(self) -> None:
         locations = [

@@ -88,7 +88,7 @@ def build_experiment_report(
             "",
             "## Interpretation",
             "",
-            "Increasing vehicle capacity generally reduces the number of routes, but route distance still depends on the construction heuristic. In this sample, the Clarke-Wright savings heuristic improves on the nearest-neighbor baseline because it explicitly evaluates the distance saved by merging single-customer routes. This creates a stronger benchmark for a future solver-based optimization model.",
+            "Increasing vehicle capacity generally reduces the number of routes, but route distance still depends on the construction heuristic and local-search improvement step. In this sample, 2-opt improves the nearest-neighbor routes by reordering stops within each vehicle route, while the Clarke-Wright savings heuristic is already stronger because it explicitly evaluates the distance saved by merging single-customer routes. This creates a stronger benchmark for a future solver-based optimization model.",
             "",
         ]
     )
