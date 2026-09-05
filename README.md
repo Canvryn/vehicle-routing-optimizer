@@ -30,6 +30,7 @@ Vehicle routing is a classic operations research problem with direct application
 - Compare routing outcomes across multiple vehicle-capacity scenarios.
 - Validate route feasibility against depot, visit, load, and capacity constraints.
 - Generate a Markdown experiment report from route and scenario outputs.
+- Evaluate route schedules against delivery time windows, waiting time, and lateness.
 
 ## Project Structure
 
@@ -47,6 +48,7 @@ Vehicle routing is a classic operations research problem with direct application
     experiments.py
     validate.py
     report.py
+    time_windows.py
   data/
     sample_customers.csv
   results/
@@ -54,6 +56,7 @@ Vehicle routing is a classic operations research problem with direct application
     route_summary.csv
     scenario_comparison.csv
     experiment_report.md
+    time_window_report.csv
   tests/
     test_distance.py
     test_heuristic.py
@@ -139,6 +142,12 @@ Generate the experiment report:
 
 ```bash
 python src/report.py --scenarios results/scenario_comparison.csv --routes results/route_summary.csv --output results/experiment_report.md
+```
+
+Evaluate time-window performance:
+
+```bash
+python src/time_windows.py --input data/sample_customers.csv --vehicle-capacity 40 --output results/time_window_report.csv
 ```
 
 Run tests:
