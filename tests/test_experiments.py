@@ -28,6 +28,8 @@ class ExperimentTests(unittest.TestCase):
         self.assertEqual(result.total_demand, 15)
         self.assertEqual(result.route_count, len(routes))
         self.assertGreater(result.total_distance, 0)
+        self.assertGreaterEqual(result.total_lateness, 0)
+        self.assertGreaterEqual(result.objective_value, result.total_distance)
         self.assertGreaterEqual(result.average_utilization, 0)
         self.assertLessEqual(result.average_utilization, 1)
 
@@ -84,8 +86,26 @@ class ExperimentTests(unittest.TestCase):
             write_scenario_results(results, output_path)
             contents = output_path.read_text(encoding="utf-8")
 
-        self.assertIn("method,vehicle_capacity,route_count,total_distance", contents)
+        self.assertIn(
+            "method,vehicle_capacity,route_count,total_distance,total_lateness",
+            contents,
+        )
         self.assertIn("nearest_neighbor,10,1", contents)
+
+    def test_lateness_penalty_changes_objective_value(self) -> None:
+        locations = [
+            Location("DEPOT", 0, 0, 0),
+            Location("C001", 300, 0, 4),
+        ]
+
+        low_penalty, _ = evaluate_capacity_scenario(
+            locations, vehicle_capacity=10, lateness_penalty=1
+        )
+        high_penalty, _ = evaluate_capacity_scenario(
+            locations, vehicle_capacity=10, lateness_penalty=100
+        )
+
+        self.assertGreater(high_penalty.objective_value, low_penalty.objective_value)
 
     def test_parse_capacities_rejects_nonpositive_values(self) -> None:
         with self.assertRaisesRegex(ValueError, "positive"):

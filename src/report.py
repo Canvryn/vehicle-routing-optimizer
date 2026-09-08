@@ -33,6 +33,14 @@ def find_fewest_route_scenario(scenario_rows: list[dict[str, str]]) -> dict[str,
     )
 
 
+def find_best_objective_scenario(scenario_rows: list[dict[str, str]]) -> dict[str, str]:
+    """Return the scenario with the lowest weighted objective value."""
+
+    if not scenario_rows:
+        raise ValueError("scenario_rows must not be empty")
+    return min(scenario_rows, key=lambda row: float(row["objective_value"]))
+
+
 def markdown_table(rows: list[dict[str, str]], columns: list[str]) -> str:
     """Render selected CSV columns as a Markdown table."""
 
@@ -52,6 +60,7 @@ def build_experiment_report(
 
     best_distance = find_lowest_distance_scenario(scenario_rows)
     fewest_routes = find_fewest_route_scenario(scenario_rows)
+    best_objective = find_best_objective_scenario(scenario_rows)
     route_count = len(route_rows)
     total_route_distance = sum(float(row["distance"]) for row in route_rows)
     total_route_load = sum(int(row["load"]) for row in route_rows)
@@ -61,6 +70,9 @@ def build_experiment_report(
         "vehicle_capacity",
         "route_count",
         "total_distance",
+        "total_lateness",
+        "late_stops",
+        "objective_value",
         "average_utilization",
         "runtime_ms",
     ]
@@ -77,6 +89,7 @@ def build_experiment_report(
             f"- Baseline route plan serves {total_route_load} units of demand.",
             f"- Lowest-distance capacity scenario: capacity {best_distance['vehicle_capacity']} with total distance {best_distance['total_distance']}.",
             f"- Fewest-route capacity scenario: capacity {fewest_routes['vehicle_capacity']} using {fewest_routes['route_count']} routes.",
+            f"- Best lateness-aware objective: {best_objective['method']} at capacity {best_objective['vehicle_capacity']} with objective {best_objective['objective_value']}.",
             "",
             "## Scenario Comparison",
             "",
@@ -88,7 +101,7 @@ def build_experiment_report(
             "",
             "## Interpretation",
             "",
-            "Increasing vehicle capacity generally reduces the number of routes, but route distance still depends on the construction heuristic and local-search improvement step. In this sample, 2-opt improves the nearest-neighbor routes by reordering stops within each vehicle route, while the Clarke-Wright savings heuristic is already stronger because it explicitly evaluates the distance saved by merging single-customer routes. This creates a stronger benchmark for a future solver-based optimization model.",
+            "Increasing vehicle capacity generally reduces the number of routes, but route quality depends on the tradeoff between travel distance and delivery lateness. The lateness-aware objective adds a penalty for missed time windows, which makes the scenario comparison closer to a real delivery-planning decision. This creates a stronger benchmark for a future solver-based optimization model.",
             "",
         ]
     )

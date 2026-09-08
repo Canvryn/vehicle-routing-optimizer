@@ -31,6 +31,7 @@ Vehicle routing is a classic operations research problem with direct application
 - Validate route feasibility against depot, visit, load, and capacity constraints.
 - Generate a Markdown experiment report from route and scenario outputs.
 - Evaluate route schedules against delivery time windows, waiting time, and lateness.
+- Score scenarios with a weighted objective that combines distance and lateness penalties.
 
 ## Project Structure
 
@@ -129,7 +130,7 @@ python src/heuristic.py --input data/sample_customers.csv --vehicle-capacity 40 
 Run capacity comparison experiments:
 
 ```bash
-python src/experiments.py --input data/sample_customers.csv --capacities 25,30,40,50 --methods nearest_neighbor,nearest_neighbor_2opt,savings,savings_2opt --output results/scenario_comparison.csv
+python src/experiments.py --input data/sample_customers.csv --capacities 25,30,40,50 --methods nearest_neighbor,nearest_neighbor_2opt,savings,savings_2opt --lateness-penalty 10 --output results/scenario_comparison.csv
 ```
 
 Validate the baseline routes:
