@@ -17,6 +17,7 @@ Vehicle routing is a classic operations research problem with direct application
 ## Current Features
 
 - Generate reproducible synthetic delivery data.
+- Generate named benchmark scenarios for small, medium, large, high-demand, sparse-region, and tight-window-style instances.
 - Represent a depot and customer locations in two-dimensional space.
 - Assign each customer a delivery demand.
 - Compute Euclidean distances between all locations.
@@ -52,6 +53,8 @@ Vehicle routing is a classic operations research problem with direct application
     time_windows.py
   data/
     sample_customers.csv
+    benchmark_small.csv
+    benchmark_medium.csv
   results/
     route_map.svg
     route_summary.csv
@@ -101,6 +104,12 @@ Generate sample data:
 
 ```bash
 python src/generate_data.py --customers 20 --output data/sample_customers.csv
+```
+
+Generate a named benchmark scenario:
+
+```bash
+python src/generate_data.py --scenario medium --output data/benchmark_medium.csv
 ```
 
 Run the baseline heuristic:
@@ -175,4 +184,4 @@ Your exact output may differ when you generate a new data set.
 - Add OR-Tools solver implementation.
 - Compare heuristic and solver performance.
 - Add time windows and lateness penalties.
-- Create experiment scenarios for small, medium, and larger instances.
+- Add a benchmark runner that evaluates every named scenario automatically.

@@ -1,0 +1,7 @@
+method,vehicle_capacity,route_count,total_distance,total_lateness,late_stops,on_time_rate,objective_value,total_demand,average_utilization,max_route_distance,runtime_ms
+nearest_neighbor,30,6,968.24,39.11,3,0.9,1359.34,159,0.8833,190.56,1.014
+nearest_neighbor,40,4,787.25,117.5,6,0.8,1962.25,159,0.9938,233.81,0.937
+nearest_neighbor,50,4,733.99,330.04,6,0.8,4034.39,159,0.795,276.65,0.876
+savings,30,6,717.58,17.89,1,0.9667,896.48,159,0.8833,147.54,3.425
+savings,40,5,624.72,189.59,6,0.8,2520.62,159,0.795,184.02,3.453
+savings,50,4,582.06,107.44,6,0.8,1656.46,159,0.795,186.61,3.026
