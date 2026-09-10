@@ -33,6 +33,7 @@ Vehicle routing is a classic operations research problem with direct application
 - Generate a Markdown experiment report from route and scenario outputs.
 - Evaluate route schedules against delivery time windows, waiting time, and lateness.
 - Score scenarios with a weighted objective that combines distance and lateness penalties.
+- Run an automated benchmark across named scenarios, capacities, and routing methods.
 
 ## Project Structure
 
@@ -51,16 +52,19 @@ Vehicle routing is a classic operations research problem with direct application
     validate.py
     report.py
     time_windows.py
+    benchmark.py
   data/
     sample_customers.csv
     benchmark_small.csv
     benchmark_medium.csv
+    benchmarks/
   results/
     route_map.svg
     route_summary.csv
     scenario_comparison.csv
     experiment_report.md
     time_window_report.csv
+    benchmark_summary.csv
   tests/
     test_distance.py
     test_heuristic.py
@@ -160,6 +164,12 @@ Evaluate time-window performance:
 python src/time_windows.py --input data/sample_customers.csv --vehicle-capacity 40 --output results/time_window_report.csv
 ```
 
+Run the named benchmark suite:
+
+```bash
+python src/benchmark.py --scenarios small,medium,high_demand,sparse_region --capacities 25,40,55 --methods nearest_neighbor,savings,savings_2opt --output results/benchmark_summary.csv
+```
+
 Run tests:
 
 ```bash
@@ -184,4 +194,4 @@ Your exact output may differ when you generate a new data set.
 - Add OR-Tools solver implementation.
 - Compare heuristic and solver performance.
 - Add time windows and lateness penalties.
-- Add a benchmark runner that evaluates every named scenario automatically.
+- Add benchmark analysis that reports best method by scenario.
